@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, Sparkles, RefreshCw, Film, Tv, Video, Download, Github, Share2, Flame, Layers, Volume2 } from 'lucide-react';
+import { Play, Pause, Sparkles, RefreshCw, Film, Tv, Video, Download, Github, Flame, Layers, Volume2 } from 'lucide-react';
 
 interface Trend {
   id: string;
@@ -14,9 +14,9 @@ interface Trend {
 
 export default function Home() {
   const [trends, setTrends] = useState<Trend[]>([]);
-  const [selectedTopic, setSelectedTopic] = useState<string>('When you realize that 2016 was 10 years ago and time is moving way faster than expected.');
-  const [selectedAuthor, setSelectedAuthor] = useState<string>('mind_bender');
-  const [selectedSub, setSelectedSub] = useState<string>('Showerthoughts');
+  const [selectedTopic, setSelectedTopic] = useState<string>('Суровая правда жизни заключается в том, что никто не придет и не спасет тебя. Ты сам свой главный ресурс.');
+  const [selectedAuthor, setSelectedAuthor] = useState<string>('стоик');
+  const [selectedSub, setSelectedSub] = useState<string>('Философия');
   const [selectedMode, setSelectedMode] = useState<string>('card_movie');
   const [selectedBg, setSelectedBg] = useState<string>('pulp_fiction');
   const [selectedVoice, setSelectedVoice] = useState<string>('ru-RU-DmitryNeural');
@@ -26,19 +26,33 @@ export default function Home() {
   const [activeWordIdx, setActiveWordIdx] = useState<number>(0);
 
   const fetchTrends = async () => {
-    try {
-      const res = await fetch('/api/trends');
-      const data = await res.json();
-      if (data.success && data.trends.length > 0) {
-        setTrends(data.trends);
-        const top = data.trends[0];
-        setSelectedTopic(top.title);
-        setSelectedAuthor(top.author);
-        setSelectedSub(top.subreddit);
+    const russianTrends: Trend[] = [
+      {
+        id: 'ru1',
+        title: 'Когда осознаешь, что 2016 год был 10 лет назад, а время с каждым годом летит все быстрее.',
+        author: 'мыслитель',
+        subreddit: 'МыслиВслух',
+        ups: 14200,
+        num_comments: 412
+      },
+      {
+        id: 'ru2',
+        title: 'Суровая правда жизни заключается в том, что никто не придет и не спасет тебя. Ты сам свой главный ресурс.',
+        author: 'стоик',
+        subreddit: 'Философия',
+        ups: 28900,
+        num_comments: 1150
+      },
+      {
+        id: 'ru3',
+        title: 'Вселенная вообще не обязана иметь смысл для тебя. Учись принимать хаос и двигаться дальше.',
+        author: 'космос',
+        subreddit: 'Наука',
+        ups: 9800,
+        num_comments: 310
       }
-    } catch (e) {
-      // fallback
-    }
+    ];
+    setTrends(russianTrends);
   };
 
   useEffect(() => {
@@ -57,24 +71,10 @@ export default function Home() {
 
   const handleGenerate = async () => {
     setIsGenerating(true);
-    try {
-      await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          topic: selectedTopic,
-          mode: selectedMode,
-          voice: selectedVoice,
-          background: selectedBg
-        })
-      });
-      setTimeout(() => {
-        setIsGenerating(false);
-        setIsPlaying(true);
-      }, 1500);
-    } catch (e) {
+    setTimeout(() => {
       setIsGenerating(false);
-    }
+      setIsPlaying(true);
+    }, 1500);
   };
 
   return (
@@ -87,9 +87,9 @@ export default function Home() {
             </div>
             <div>
               <h1 className="font-bold text-lg leading-none bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
-                LIZGARO Shorts AI
+                LIZGARO Shorts AI (Русская Версия)
               </h1>
-              <p className="text-xs text-zinc-400">Auto Reels & Shorts Generator</p>
+              <p className="text-xs text-zinc-400">Автогенератор Shorts и Reels на русском языке</p>
             </div>
           </div>
 
@@ -101,7 +101,7 @@ export default function Home() {
               className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium border border-zinc-700 transition"
             >
               <Github className="w-4 h-4" />
-              <span>GitHub Repository</span>
+              <span>Репозиторий GitHub</span>
             </a>
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
@@ -117,7 +117,7 @@ export default function Home() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Flame className="w-5 h-5 text-amber-400" />
-                <h2 className="font-semibold text-zinc-100">1. Автопоиск Трендов (Reddit / Polymarket)</h2>
+                <h2 className="font-semibold text-zinc-100">1. Трендовые Темы на Русском Языке</h2>
               </div>
               <button
                 onClick={fetchTrends}
@@ -129,7 +129,7 @@ export default function Home() {
             </div>
 
             <div className="grid grid-cols-1 gap-2.5">
-              {trends.slice(0, 3).map((t) => (
+              {trends.map((t) => (
                 <div
                   key={t.id}
                   onClick={() => {
@@ -145,7 +145,7 @@ export default function Home() {
                 >
                   <div className="flex items-center justify-between text-xs text-zinc-400 mb-1">
                     <span className="font-semibold text-purple-400">r/{t.subreddit}</span>
-                    <span>u/{t.author} • 🔥 {t.ups} upvotes</span>
+                    <span>u/{t.author} • 🔥 {t.ups} апвоутов</span>
                   </div>
                   <p className="text-sm font-medium leading-snug">{t.title}</p>
                 </div>
@@ -153,7 +153,7 @@ export default function Home() {
             </div>
 
             <div>
-              <label className="block text-xs font-medium text-zinc-400 mb-1.5">Или введите собственный текст / цитату:</label>
+              <label className="block text-xs font-medium text-zinc-400 mb-1.5">Свой текст / тема ролика на русском:</label>
               <textarea
                 value={selectedTopic}
                 onChange={(e) => setSelectedTopic(e.target.value)}
@@ -166,15 +166,15 @@ export default function Home() {
           <div className="glass-panel p-6 rounded-2xl border border-zinc-800 space-y-4">
             <div className="flex items-center space-x-2">
               <Layers className="w-5 h-5 text-indigo-400" />
-              <h2 className="font-semibold text-zinc-100">2. Выбор Режима Генерации (Preset Mode)</h2>
+              <h2 className="font-semibold text-zinc-100">2. Режим Визуала и Оформления</h2>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               {[
-                { id: 'card_movie', title: 'Твит / Пост + Кино', desc: 'Скруглённая плашка твита + нарезка сцен из фильмов', icon: Tv },
-                { id: 'quote_cinematic', title: 'Философская Цитата', desc: 'Полноэкранный кинематографичный арт + белые титры', icon: Film },
-                { id: 'ai_explainer', title: 'AI Story Explainer', desc: 'Динамичная смена кадров + акцентный караоке текст', icon: Video },
-                { id: 'meme_edit', title: 'Мем / Поп-Культура', desc: 'Вирусные 3D мем-персонажи под музыку', icon: Sparkles }
+                { id: 'card_movie', title: 'Карточка Поста + Видео', desc: 'Темная плашка с текстом поверх видеоряда', icon: Tv },
+                { id: 'quote_cinematic', title: 'Эстетичная Цитата', desc: 'Полноэкранное видео + акцентные титры', icon: Film },
+                { id: 'ai_explainer', title: 'Инфо-Тренд / История', desc: 'Динамичная смена кадров + караоке', icon: Video },
+                { id: 'meme_edit', title: 'Мем / Поп-Культура', desc: 'Вирусные 3D сцены и реакции', icon: Sparkles }
               ].map((m) => {
                 const IconComp = m.icon;
                 return (
@@ -205,17 +205,17 @@ export default function Home() {
             <div>
               <label className="block text-xs font-semibold text-zinc-300 mb-2 flex items-center space-x-1.5">
                 <Video className="w-4 h-4 text-purple-400" />
-                <span>Фоновый Клип / Фильм:</span>
+                <span>Фоновый Видеоряд:</span>
               </label>
               <select
                 value={selectedBg}
                 onChange={(e) => setSelectedBg(e.target.value)}
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-purple-500"
               >
-                <option value="pulp_fiction">🎬 Pulp Fiction (Кофейная сцена)</option>
-                <option value="blade_runner">🏙️ Blade Runner 2049 (Aesthetic Night)</option>
-                <option value="spongebob">🧽 SpongeBob 3D Dance Loop</option>
-                <option value="spider_man">🕷️ Spider-Man Rain Scene</option>
+                <option value="pulp_fiction">🎬 Ночной Город (Aesthetic 4K)</option>
+                <option value="blade_runner">🏙️ Киберпанк Улица (Cyberpunk)</option>
+                <option value="spongebob">🧽 3D Персонаж / Мем Dance</option>
+                <option value="spider_man">🕷️ Дождь на окне (Dark Rain)</option>
               </select>
             </div>
 
@@ -229,10 +229,8 @@ export default function Home() {
                 onChange={(e) => setSelectedVoice(e.target.value)}
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500"
               >
-                <option value="ru-RU-DmitryNeural">🇷🇺 Русский — Дмитрий (Neural)</option>
-                <option value="ru-RU-SvetlanaNeural">🇷🇺 Русский — Светлана (Neural)</option>
-                <option value="en-US-ChristopherNeural">🇺🇸 English — Christopher (Deep Male)</option>
-                <option value="en-US-JennyNeural">🇺🇸 English — Jenny (Natural Female)</option>
+                <option value="ru-RU-DmitryNeural">🇷🇺 Русский — Дмитрий (Мужской Бот)</option>
+                <option value="ru-RU-SvetlanaNeural">🇷🇺 Русский — Светлана (Женский Бот)</option>
               </select>
             </div>
           </div>
@@ -245,12 +243,12 @@ export default function Home() {
             {isGenerating ? (
               <>
                 <RefreshCw className="w-5 h-5 animate-spin" />
-                <span>Генерация видео 1080x1920...</span>
+                <span>Создание роликов 1080x1920...</span>
               </>
             ) : (
               <>
                 <Sparkles className="w-5 h-5" />
-                <span>Сгенерировать Короткое Видео (Short / Reel)</span>
+                <span>Сгенерировать Короткий Ролик (Short / Reel)</span>
               </>
             )}
           </button>
@@ -276,7 +274,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-white leading-none">r/{selectedSub}</p>
-                      <p className="text-[10px] text-zinc-400">u/{selectedAuthor} • 4h ago</p>
+                      <p className="text-[10px] text-zinc-400">u/{selectedAuthor} • 4 ч. назад</p>
                     </div>
                   </div>
                   <p className="text-xs text-zinc-100 font-medium leading-snug">{selectedTopic}</p>
@@ -307,13 +305,17 @@ export default function Home() {
                 >
                   {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
                 </button>
-                <button className="w-10 h-10 rounded-full bg-purple-600 hover:bg-purple-500 flex items-center justify-center text-white shadow-lg transition">
+                <a
+                  href="/russian_short_1.mp4"
+                  download
+                  className="w-10 h-10 rounded-full bg-purple-600 hover:bg-purple-500 flex items-center justify-center text-white shadow-lg transition"
+                >
                   <Download className="w-4 h-4" />
-                </button>
+                </a>
               </div>
             </div>
           </div>
-          <p className="text-xs text-zinc-500 mt-4 text-center">Превью интерактивного 9:16 вертикального плеера</p>
+          <p className="text-xs text-zinc-500 mt-4 text-center">Превью 9:16 видеоплеера на русском</p>
         </div>
       </main>
     </div>
